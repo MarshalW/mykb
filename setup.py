@@ -11,7 +11,7 @@ setup(
     description="Wikipedia术语词库生成工具",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/mykb",
+    url="https://github.com/marshal/mykb",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
