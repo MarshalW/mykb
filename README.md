@@ -3,7 +3,7 @@
 **作者**：Marshal Wu  
 **邮箱**：marshal.wu@gmail.com  
 **版本**：1.0.0  
-**源码地址**：https://github.com/marshal/mykb（暂未发布至 PyPI，需本地克隆使用）
+**源码地址**：https://github.com/marshal/mykb （暂未发布至 PyPI，需本地克隆使用）
 
 ---
 
