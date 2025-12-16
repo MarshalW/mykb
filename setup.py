@@ -25,6 +25,8 @@ setup(
         "pandas",
         "openpyxl",
         "tqdm",
+        "wikitextparser",
+        "bleach"
     ],
     entry_points={
         "console_scripts": [

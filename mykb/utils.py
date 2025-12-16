@@ -2,6 +2,8 @@ import os
 import time
 import wikipedia
 from markdownify import markdownify as md
+import wikitextparser as wtp
+import bleach
 
 # 记录原始语言环境
 ORIGINAL_LANG = "zh"
@@ -24,6 +26,46 @@ def is_valid_term(term):
         return False
     return True
 
+def wikitext_to_markdown(wikitext: str) -> str:
+    """
+    把 Wikitext 转换成尽可能标准的 GitHub Flavored Markdown
+    """
+    parsed = wtp.parse(wikitext)
+
+    # 1. 去掉 <ref>、</ref> 及内容
+    for ref in parsed.get_tags("ref"):
+        ref.string = ""
+
+    # 2. 把内部链接 [[xxx|yyy]] -> [yyy](xxx)
+    for wlink in parsed.wikilinks:
+        title = wlink.title.strip()
+        text  = wlink.text or title
+        # 空格转 _
+        title = title.replace(" ", "_")
+        wlink.string = f"[{text}](https://zh.wikipedia.org/wiki/{title})"
+
+    # 3. 把 == 标题 == 转成 Markdown
+    lines = []
+    for line in parsed.string.splitlines():
+        line = line.strip()
+        if line.startswith("=") and line.endswith("="):
+            level = line.count("=") // 2
+            level = min(level, 6)
+            content = line.strip("= ")
+            lines.append("#" * level + " " + content)
+        else:
+            lines.append(line)
+
+    md_text = "\n".join(lines)
+
+    # 4. 清理残留的 HTML 标签
+    md_text = bleach.clean(md_text, tags=[], strip=True)
+
+    # 5. 把剩余 HTML 块再转一次 Markdown（表格、列表等）
+    md_text = md(md_text, heading_style="ATX")
+
+    return md_text.strip()
+
 def fetch_page_content(term, retries=3):
     """尝试获取页面内容，失败重试（支持中英文回退）"""
     current_lang = wikipedia.languages()[ORIGINAL_LANG]  # 获取当前语言
@@ -32,7 +74,8 @@ def fetch_page_content(term, retries=3):
         try:
             # 主要尝试：使用当前语言获取页面
             page = wikipedia.page(term)
-            return md(page.content)
+            return wikitext_to_markdown(page.content)
+            # return md(page.content)
             
         except wikipedia.exceptions.DisambiguationError:
             print(f"歧义页跳过: {term}")

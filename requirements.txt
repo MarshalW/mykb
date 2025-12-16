@@ -3,3 +3,5 @@ markdownify
 pandas
 openpyxl
 tqdm
+wikitextparser
+bleach
