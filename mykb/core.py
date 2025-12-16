@@ -88,8 +88,8 @@ def normal_mode(topic):
             content_md = fetch_page_content(term)
             if content_md:
                 results.append({
-                    "title": term,
-                    "content": content_md
+                    "Title": term,
+                    "Content": content_md
                 })
             else:
                 failed_terms.append(term)
